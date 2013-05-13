@@ -1,0 +1,716 @@
+<!DOCTYPE  html>
+<html>
+<head>
+    <style type="text/css">
+        .box  {
+            border: 2px black dashed;
+            margin:5px;
+            padding:3px;
+            width:80%;
+            overflow:auto;
+        }
+
+
+    </style>
+
+</head>
+<body>
+<h1>Spletna trgovina</h1>
+<p>
+    Naredili bomo preprosto spletno trgovino
+
+
+    Na začetku naredimo nov projekt
+
+<div class="box">
+<pre>
+Rails new deport
+</pre>
+</div>
+In se premaknemo tja
+
+<div class="box">
+<pre name="code" class="ruby" >
+Cd deport
+</pre>
+</div>
+/naredimo scaffold
+
+<div class="box">
+<pre name="code" class="ruby" >
+rails generate scaffold Product title:string description:text image_url:string price:decimal
+</pre>
+</div>
+/Potem odpremo program Rubymine in naš projekt,narejenih imamo nekaj datotek, zanima nas migration, ki je poimenovana  *timestapm*_create_products.rb.  v db/migrate
+To spremenimo tako:
+class CreateProducts < ActiveRecord::Migration
+
+<div class="box">
+<pre name="code" class="ruby" >
+  def change
+    create_table :products do |t|
+      t.string :title
+      t.text :description
+      t.string :image_url
+      t.decimal :price, precision: 8, scale: 2
+
+      t.timestamps
+    end
+  end
+end
+</pre>
+</div>
+
+<div class="box">
+<pre name="code" class="ruby" >
+rake db:migrate
+</pre>
+</div>
+/bazo posodobimo
+
+
+<div class="box">
+<pre name="code" class="ruby" >
+rails s
+</pre>
+</div>
+/zaženemo strežnik, in gremo na localhost:3000/
+/do produktov pridemo tako da dodamo ime kontrolerja localhost:3000/products
+/tam vidimo link da dodamo nov produkt
+
+
+
+
+/Potem v app/views/products/_form.html.erb  spremenimo kodo
+
+<div class="box">
+    <pre>
+    <%= form_for(@product) do |f| %>
+<% if @product.errors.any? %>
+<div id="error_explanation">
+   <pre> <h2><%= pluralize(@product.errors.count, "error") %>
+        prohibited this product from being saved:</h2>        </pre>
+    <ul>
+        <% @product.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+        <% end %>
+    </ul>
+</div>
+<% end %>
+<div class="field">
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+</div>
+<div class="field">
+    <%= f.label :description %><br />
+    <%= f.text_area :description, rows: 6 %>
+</div>
+<div class="field">
+    <%= f.label :image_url %><br />
+    <%= f.text_field :image_url %>
+</div>
+<div class="field">
+    <%= f.label :price %><br />
+    <%= f.text_field :price %>
+</div>
+<div class="actions">
+    <%= f.submit %>
+</div>
+<% end %>
+</pre>
+</div>
+
+/zdaj lahko dodamo nov produkt, če kliknemo gumb Back lahko tudi vidimo dodane produkte.
+
+/uredimo css v app/assets/stylesheets/products.css.scss
+
+<div class="box">
+<pre name="code" class="ruby" >
+.products {
+  table {
+    border-collapse: collapse;
+  }
+
+  table tr td {
+    padding: 5px;
+    vertical-align: top;
+  }
+
+  .list_image {
+    width:  60px;
+    height: 70px;
+  }
+
+  .list_description {
+    width: 60%;
+
+    dl {
+      margin: 0;
+    }
+
+    dt {
+      color:        #244;
+      font-weight:  bold;
+      font-size:    larger;
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+
+  .list_actions {
+    font-size:    x-small;
+    text-align:   right;
+    padding-left: 1em;
+  }
+
+  .list_line_even {
+    background:   #e0f8f8;
+  }
+  .list_line_odd {
+    background:   #f8b0f8;
+  }
+}
+</pre>
+</div>
+
+/app/views/layouts/application.html.erb
+
+<div class="box">
+<pre name="code" class="ruby" ><!DOCTYPE html>
+<html>
+<head>
+    <title>Depot</title>
+    <%= stylesheet_link_tag "application", :media => "all" %>
+    <%= javascript_include_tag "application" %>
+    <%= csrf_meta_tags %>
+</head>
+<body class='<%= controller.controller_name %>'>
+<%= yield %>
+</body>
+</html>
+</pre>
+</div>
+
+
+
+
+
+
+/app/views/products/index.html.erb
+
+<div class="box">
+<pre name="code" class="ruby" ><h1>Listing products</h1>
+<table>
+    <% @products.each do |product| %>
+    <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
+        <td>
+            <%= image_tag(product.image_url, class: 'list_image') %>
+        </td>
+        <td class="list_description">
+            <dl>
+                <dt><%= product.title %></dt>
+                <dd><%= truncate(strip_tags(product.description),
+                    length: 80) %></dd>
+            </dl>
+        </td>
+        <td class="list_actions">
+            <%= link_to 'Show', product %><br/>
+            <%= link_to 'Edit', edit_product_path(product) %><br/>
+            <%= link_to 'Destroy', product,
+            confirm: 'Are you sure?',
+            method: :delete %>
+        </td>
+    </tr>
+    <% end %>
+</table>
+<br />
+<%= link_to 'New product', new_product_path %>
+</pre>
+</div>
+
+• naredili smo bazo
+• uporabili  migration za kreiranje in urejanje v bazi
+• seznam produktov z uporrabo scaffold generatorja
+• izgled za prikazovanje produktov.
+
+Shranimo na Github, tako shranjujte tudi vsakič ko končate z delom
+git init
+git add .
+git commit -m "Depot Scaffold"
+
+VALIDACIJA
+/app/models/product.rb
+
+<div class="box">
+<pre name="code" class="ruby" >class Product < ActiveRecord::Base
+validates :title, :description, :image_url, presence: true
+validates :price, numericality: {greater_than_or_equal_to: 0.01}
+validates :title, uniqueness: true
+validates :image_url, allow_blank: true, format: {
+with: %r{\.(gif|jpg|png)$}i,
+message: 'must be a URL for GIF, JPG or PNG image.'
+}
+end
+</pre>
+</div>
+
+<div class="box">
+<pre name="code" class="ruby" >
+rails generate controller Store index
+</pre>
+</div>
+
+uredimo
+/depot_d/config/routes.rb
+
+<div class="box">
+<pre name="code" class="ruby" >
+Depot::Application.routes.draw do
+get "store/index"
+resources :products
+# ...
+# You can have the root of your site routed with "root"
+# just remember to delete public/index.html.
+# root :to => 'welcome#index'
+ root to: 'store#index', as: 'store'
+end
+</pre>
+</div>
+
+/sedaj smo naredili preusmeritve da imamo to za prvo stran, če še niste izbrisali index.html strani kakor je pisalo prej na prvi strani lahko to naredite s komando
+
+<div class="box">
+<pre name="code" class="ruby" >
+rm public/index.html
+</pre>
+</div>
+
+
+/depot_d/app/controllers/store_controller.rb
+
+<div class="box">
+<pre name="code" class="ruby" >
+class StoreController < ApplicationController
+def index
+@products = Product.order(:title)
+end
+end
+
+</pre>
+</div>
+
+
+
+
+/depot_d/app/assets/stylesheets/store.css.scss
+
+<div class="box">
+<pre name="code" class="ruby" >
+.store {
+  h1 {
+    margin: 0;
+    padding-bottom: 0.5em;
+    font:  150% sans-serif;
+    color: #226;
+    border-bottom: 3px dotted #77d;
+  }
+
+  /* An entry in the store catalog */
+  .entry {
+    overflow: auto;
+    margin-top: 1em;
+    border-bottom: 1px dotted #77d;
+    min-height: 100px;
+
+    img {
+      width: 80px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+      position: absolute;
+    }
+
+    h3 {
+      font-size: 120%;
+      font-family: sans-serif;
+      margin-left: 100px;
+      margin-top: 0;
+      margin-bottom: 2px;
+      color: #227;
+    }
+
+    p, div.price_line {
+      margin-left: 100px;
+      margin-top: 0.5em; 
+      margin-bottom: 0.8em; 
+    }
+
+    .price {
+      color: #44a;
+      font-weight: bold;
+      margin-right: 3em;
+    }
+  }
+}
+</pre>
+</div>
+
+
+
+
+/depot_d/app/views/store/index.html.erb
+
+<div class="box">
+<pre>
+<% if notice %>
+<p id="notice"><%= notice %></p>
+<% end %>
+<h1>Katalog</h1>
+<% @products.each do |product| %>
+<div class="entry">
+    <%= image_tag(product.image_url) %>
+    <h3><%= product.title %></h3>
+    <%= sanitize(product.description) %>
+    <div class="price_line">
+        <span class="price"><%= product.price %></span>
+    </div>
+</div>
+<% end %>
+</pre>
+</div>
+
+
+
+/depot_e/app/views/layouts/application.html.erb
+
+<div class="box">
+<pre name="code" class="ruby" >
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trgovina</title>
+    <%= stylesheet_link_tag "application" %>
+    <%= javascript_include_tag "application" %>
+    <%= csrf_meta_tag %>
+</head>
+<body class="<%= controller.controller_name %>">
+<div id="banner">
+    <%= image_tag("logo.png") %>
+    <%= @page_title || "Spletna trgovina" %>
+</div>
+<div id="columns">
+    <div id="side">
+        <ul>
+            <li><a href="localhost:3000/">Home</a></li>
+            <li><a href="localhost:3000/faq">Questions</a></li>
+            <li><a href="localhost:3000/news">News</a></li>
+            <li><a href="localhost:3000/contact">Contact</a></li>
+        </ul>
+    </div>
+    <div id="main">
+        <%= yield %>
+    </div>
+</div>
+</body>
+</html>
+</pre>
+</div>
+
+/depot_e/app/assets/stylesheets/application.css.scss
+
+<div class="box">
+<pre name="code" class="ruby" >
+#banner {
+  background: #9c9;
+  padding: 10px;
+  border-bottom: 2px solid;
+  font: small-caps 40px/40px "Times New Roman", serif;
+  color: #282;
+  text-align: center;
+
+  img {
+    float: left;
+  }
+}
+
+#notice {
+  color: #000 !important;
+  border: 2px solid red;
+  padding: 1em;
+  margin-bottom: 2em;
+  background-color: #f0f0f0;
+  font: bold smaller sans-serif;
+}
+
+#columns {
+  background: #141;
+
+  #main {
+    margin-left: 17em;
+    padding: 1em;
+    background: white;
+  }
+
+  #side {
+    float: left;
+    padding: 1em 2em;
+    width: 13em;
+    background: #141;
+
+    ul {
+      padding: 0;
+      li {
+        list-style: none;
+        a {
+          color: #bfb;
+          font-size: small;
+        }
+      }
+    }
+  }
+}
+
+</pre>
+</div>
+
+
+/depot_e/app/views/store/index.html.erb
+
+<div class="box">
+    <pre>
+        <span class="price"><%= number_to_currency(product.price) %></span>
+</pre>
+</div>
+
+Košarica:
+
+<div class="box">
+<pre name="code" class="ruby" >
+rails generate scaffold cart
+</pre>
+        </div>
+<div class="box">
+<pre name="code" class="ruby" >
+rake db:migrate
+</pre>
+</div>
+
+/depot_f/app/controllers/application_controller.rb
+
+<div class="box">
+<pre name="code" class="ruby" >
+ class ApplicationController < ActionController::Base
+ protect_from_forgery
+  private
+  def current_cart
+  Cart.find(session[:cart_id])
+  rescue ActiveRecord::RecordNotFound
+  cart = Cart.create
+  session[:cart_id] = cart.id
+  cart
+ end
+end
+</pre>
+</div>
+
+depot> rails generate scaffold line_item product_id:integer
+<div class="box">
+<pre name="code" class="ruby" >
+cart_id:integer
+depot> rake db:migrate
+</pre>
+</div>
+    /depot_f/app/models/cart.rb
+
+    <div class="box">
+<pre name="code" class="ruby" >
+class Cart < ActiveRecord::Base
+has_many :line_items, dependent: :destroy
+end
+</pre>
+    </div>
+
+        /depot_f/app/models/line_item.rb
+
+        <div class="box">
+<pre name="code" class="ruby" >
+class LineItem < ActiveRecord::Base
+belongs_to :product
+belongs_to :cart
+end
+</pre>
+        </div>
+            /depot_f/app/models/product.rb
+
+            <div class="box">
+<pre name="code" class="ruby" >
+class Product < ActiveRecord::Base
+ has_many :line_items
+before_destroy :ensure_not_referenced_by_any_line_item
+#...
+  private
+  # ensure that there are no line items referencing this product
+  def ensure_not_referenced_by_any_line_item
+   if line_items.empty?
+    return true
+ else
+   errors.add(:base, 'Line Items present')
+   return false
+   end
+  end
+end
+</pre>
+            </div>
+
+
+                dodamo gumb za dodajanje v košarico
+                /depot_f/app/views/store/index.html.erb
+
+                <div class="box">
+<pre name="code" class="ruby" ><% if notice %>
+<p id="notice"><%= notice %></p>
+<% end %>
+<h1>Katalog</h1>
+<% @products.each do |product| %>
+<div class="entry">
+    <%= image_tag(product.image_url) %>
+    <h3><%= product.title %></h3>
+    <%= sanitize(product.description) %>
+    <div class="price_line">
+        <span class="price"><%= number_to_currency(product.price) %></span>
+        <%= button_to 'Add to Cart', line_items_path(product_id: product) %>
+    </div>
+</div>
+<% end %>
+</pre>
+                </div>
+                    In uredimo css
+
+                    <div class="box">
+<pre name="code" class="ruby" >
+p, div.price_line {
+margin-left: 100px;
+margin-top: 0.5em;
+margin-bottom: 0.8em;
+form, div {
+display: inline;
+}
+}
+</pre>
+                    </div>
+
+                        <div class="box">
+<pre name="code" class="ruby" >
+/depot_f/app/controllers/line_items_controller.rb
+class LineItemsController < ApplicationController
+  # GET /line_items
+  # GET /line_items.json
+  def index
+    @line_items = LineItem.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @line_items }
+    end
+  end
+
+  # GET /line_items/1
+  # GET /line_items/1.json
+  def show
+    @line_item = LineItem.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @line_item }
+    end
+  end
+
+  # GET /line_items/new
+  # GET /line_items/new.json
+  def new
+    @line_item = LineItem.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.json { render json: @line_item }
+    end
+  end
+
+  # GET /line_items/1/edit
+  def edit
+    @line_item = LineItem.find(params[:id])
+  end
+
+  # POST /line_items
+  # POST /line_items.json
+  def create
+    @cart = current_cart
+    product = Product.find(params[:product_id])
+    @line_item = @cart.line_items.build
+    @line_item.product = product
+
+    respond_to do |format|
+      if @line_item.save
+        format.html { redirect_to @line_item.cart,
+          notice: 'Line item was successfully created.' }
+        format.json { render json: @line_item,
+          status: :created, location: @line_item }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @line_item.errors,
+          status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /line_items/1
+  # PUT /line_items/1.json
+  def update
+    @line_item = LineItem.find(params[:id])
+
+    respond_to do |format|
+      if @line_item.update_attributes(params[:line_item])
+        format.html { redirect_to @line_item, notice: 'Line item was successfully updated.' }
+        format.json { head :no_content }
+      else
+        format.html { render action: "edit" }
+        format.json { render json: @line_item.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /line_items/1
+  # DELETE /line_items/1.json
+  def destroy
+    @line_item = LineItem.find(params[:id])
+    @line_item.destroy
+
+    respond_to do |format|
+      format.html { redirect_to line_items_url }
+      format.json { head :no_content }
+    end
+  end
+end
+</pre>
+
+                        </div>
+                            <div class="box">
+                             <pre lang="ruby">
+/depot_f/app/views/carts/show.html.erb
+<% if notice %>
+<p id="notice"><%= notice %></p>
+<% end %>
+<h2>Kosarica</h2>
+<ul>
+    <% @cart.line_items.each do |item| %>
+    <li><%= item.product.title %></li>
+    <% end %>
+</ul>
+</pre>
+
+</div>
+</body>
+
+</html>
+ 
